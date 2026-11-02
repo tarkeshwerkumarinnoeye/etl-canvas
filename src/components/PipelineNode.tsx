@@ -96,60 +96,65 @@ export function PipelineNodeComponent({ id, data, selected }: NodeProps) {
       {/* Status indicator dot */}
       <div className={`absolute top-2 right-2 w-2 h-2 rounded-full ${dotColor} shadow-sm animate-pulse`} />
       
-      {/* Handles on all 4 sides - source and target overlap for clean look */}
-      {/* Top */}
+      {/* 
+        Each side has BOTH source and target handles overlapping perfectly.
+        This allows connections in ANY direction from ANY side.
+        The visual shows as a single dot, but both types are active.
+      */}
+      
+      {/* TOP - Source + Target (overlapping) */}
       <Handle
         type="source"
         position={Position.Top}
-        id="top-source"
+        id="top"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       <Handle
         type="target"
         position={Position.Top}
-        id="top-target"
+        id="top"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       
-      {/* Bottom */}
+      {/* BOTTOM - Source + Target (overlapping) */}
       <Handle
         type="source"
         position={Position.Bottom}
-        id="bottom-source"
+        id="bottom"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       <Handle
         type="target"
         position={Position.Bottom}
-        id="bottom-target"
+        id="bottom"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       
-      {/* Left */}
+      {/* LEFT - Source + Target (overlapping) */}
       <Handle
         type="source"
         position={Position.Left}
-        id="left-source"
+        id="left"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       <Handle
         type="target"
         position={Position.Left}
-        id="left-target"
+        id="left"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       
-      {/* Right */}
+      {/* RIGHT - Source + Target (overlapping) */}
       <Handle
         type="source"
         position={Position.Right}
-        id="right-source"
+        id="right"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       <Handle
         type="target"
         position={Position.Right}
-        id="right-target"
+        id="right"
         className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       
