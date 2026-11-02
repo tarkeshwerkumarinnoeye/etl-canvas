@@ -38,6 +38,22 @@
   box-shadow: 0 0 8px currentColor;
 }
 
+/* Edge selection styling */
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #ef4444 !important;
+  stroke-width: 4 !important;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
+}
+
+.react-flow__edge {
+  cursor: pointer;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke-width: 4 !important;
+  filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.5));
+}
+
 .react-flow__controls button {
   background-color: #1f2937 !important;
   color: #9ca3af !important;

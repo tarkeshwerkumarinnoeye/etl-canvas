@@ -8,8 +8,10 @@ interface ToolbarProps {
   onImport: () => void;
   onReset: () => void;
   onLoadExample: () => void;
+  onDeleteSelected: () => void;
   nodeCount: number;
   edgeCount: number;
+  hasSelection: boolean;
 }
 
 export function Toolbar({
@@ -20,8 +22,10 @@ export function Toolbar({
   onImport,
   onReset,
   onLoadExample,
+  onDeleteSelected,
   nodeCount,
   edgeCount,
+  hasSelection,
 }: ToolbarProps) {
   return (
     <div className="h-14 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700/50 flex items-center px-4 gap-2">
@@ -88,6 +92,20 @@ export function Toolbar({
       >
         <RotateCcw size={14} />
         Reset View
+      </button>
+
+      <button
+        onClick={onDeleteSelected}
+        disabled={!hasSelection}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+          hasSelection
+            ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+            : 'bg-gray-800/50 text-gray-600 border border-gray-700/50 cursor-not-allowed'
+        }`}
+        title={hasSelection ? 'Delete selected (Del)' : 'Select a node or edge first'}
+      >
+        <Trash2 size={14} />
+        Delete Selected
       </button>
 
       <button
