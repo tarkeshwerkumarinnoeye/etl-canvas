@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* React Flow custom styles */
+.react-flow__node {
+  cursor: grab;
+}
+
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+.react-flow__edge-path {
+  stroke-linecap: round;
+}
+
+.react-flow__controls button {
+  background-color: #1f2937 !important;
+  color: #9ca3af !important;
+  border-bottom: 1px solid #374151 !important;
+}
+
+.react-flow__controls button:hover {
+  background-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+.react-flow__controls button svg {
+  fill: currentColor !important;
+}
+
+.react-flow__minimap {
+  background-color: #111827 !important;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Animation for the empty state */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
