@@ -385,7 +385,7 @@ export default function App() {
             <div className="space-y-1 text-[10px]">
               <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Del</kbd> Remove selected</div>
               <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Scroll</kbd> Zoom</div>
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Drag</kbd> Connect nodes</div>
+              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Drag</kbd> Connect from any side</div>
             </div>
           </div>
 
