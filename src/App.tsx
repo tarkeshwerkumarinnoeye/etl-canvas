@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -252,17 +252,77 @@ export default function App() {
     }, 100);
   }, [setNodes, setEdges, reactFlowInstance]);
 
-  // Control animation visibility
+  const handleDeleteSelected = useCallback(() => {
+    setNodes((nds) => nds.filter((n) => !n.selected));
+    setEdges((eds) => eds.filter((e) => !e.selected));
+  }, [setNodes, setEdges]);
+
+  const handleReverseEdge = useCallback(() => {
+    setEdges((eds) => eds.map((e) => {
+      if (e.selected) {
+        return {
+          ...e,
+          source: e.target,
+          target: e.source,
+          sourceHandle: e.targetHandle,
+          targetHandle: e.sourceHandle,
+        };
+      }
+      return e;
+    }));
+  }, [setEdges]);
+
+  // Keyboard shortcut: R to reverse selected edge
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'r' || e.key === 'R') {
+        // Don't trigger if typing in an input
+        if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') {
+          return;
+        }
+        handleReverseEdge();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleReverseEdge]);
+
+  const hasSelection = useMemo(() => {
+    return nodes.some(n => n.selected) || edges.some(e => e.selected);
+  }, [nodes, edges]);
+
+  const hasEdgeSelected = useMemo(() => {
+    return edges.some(e => e.selected);
+  }, [edges]);
+
+  // Control animation visibility and highlight selected edges
   const displayEdges = useMemo(() => {
-    if (!isAnimating) {
-      return edges.map(e => ({
+    return edges.map(e => {
+      const isSelected = e.selected;
+      const baseEdge = {
         ...e,
-        type: 'default',
-        markerEnd: { type: MarkerType.ArrowClosed, color: '#4b5563' },
-        style: { stroke: '#4b5563', strokeWidth: 2 },
-      } as Edge));
-    }
-    return edges;
+        style: {
+          ...e.style,
+          strokeWidth: isSelected ? 4 : 3,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: isSelected ? '#ef4444' : (e.markerEnd as any)?.color || '#6366f1',
+        },
+      };
+
+      if (!isAnimating) {
+        return {
+          ...baseEdge,
+          type: 'default',
+          style: {
+            ...baseEdge.style,
+            stroke: isSelected ? '#ef4444' : '#4b5563',
+          },
+        } as Edge;
+      }
+      return baseEdge as Edge;
+    });
   }, [edges, isAnimating]);
 
   return (
@@ -275,8 +335,12 @@ export default function App() {
         onImport={handleImport}
         onReset={handleReset}
         onLoadExample={handleLoadExample}
+        onDeleteSelected={handleDeleteSelected}
+        onReverseEdge={handleReverseEdge}
         nodeCount={nodes.length}
         edgeCount={edges.length}
+        hasSelection={hasSelection}
+        hasEdgeSelected={hasEdgeSelected}
       />
       
       <div className="flex flex-1 overflow-hidden">
@@ -301,6 +365,8 @@ export default function App() {
               markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1' },
             }}
             className="bg-gray-950"
+            selectNodesOnDrag={false}
+            deleteKeyCode={['Backspace', 'Delete']}
           >
             <Background
               variant={BackgroundVariant.Dots}
@@ -383,9 +449,11 @@ export default function App() {
             </div>
             <div className="font-semibold text-gray-300 mb-1.5 text-[11px] uppercase tracking-wider border-t border-gray-700/50 pt-2">Shortcuts</div>
             <div className="space-y-1 text-[10px]">
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Del</kbd> Remove selected</div>
+              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Del</kbd> Remove selected node/edge</div>
+              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">R</kbd> Reverse edge direction</div>
+              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Click</kbd> Select edge to delete</div>
               <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Scroll</kbd> Zoom</div>
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Drag</kbd> Connect nodes</div>
+              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Drag</kbd> Connect from any side</div>
             </div>
           </div>
 

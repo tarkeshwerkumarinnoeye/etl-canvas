@@ -96,10 +96,66 @@ export function PipelineNodeComponent({ id, data, selected }: NodeProps) {
       {/* Status indicator dot */}
       <div className={`absolute top-2 right-2 w-2 h-2 rounded-full ${dotColor} shadow-sm animate-pulse`} />
       
+      {/* 
+        Each side has BOTH source and target handles overlapping perfectly.
+        This allows connections in ANY direction from ANY side.
+        The visual shows as a single dot, but both types are active.
+      */}
+      
+      {/* TOP - Source + Target (overlapping) */}
+      <Handle
+        type="source"
+        position={Position.Top}
+        id="top"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+      />
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="top"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+      />
+      
+      {/* BOTTOM - Source + Target (overlapping) */}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="bottom"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+      />
+      <Handle
+        type="target"
+        position={Position.Bottom}
+        id="bottom"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+      />
+      
+      {/* LEFT - Source + Target (overlapping) */}
+      <Handle
+        type="source"
+        position={Position.Left}
+        id="left"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+      />
       <Handle
         type="target"
         position={Position.Left}
-        className={`!w-3 !h-3 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+        id="left"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+      />
+      
+      {/* RIGHT - Source + Target (overlapping) */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="right"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
+      />
+      <Handle
+        type="target"
+        position={Position.Right}
+        id="right"
+        className={`!w-4 !h-4 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
       />
       
       <div className="flex items-center gap-2.5 relative z-10">
@@ -118,12 +174,6 @@ export function PipelineNodeComponent({ id, data, selected }: NodeProps) {
           </div>
         </div>
       </div>
-      
-      <Handle
-        type="source"
-        position={Position.Right}
-        className={`!w-3 !h-3 !border-2 !border-gray-900 !rounded-full hover:!scale-150 transition-transform ${dotColor}`}
-      />
     </div>
   );
 }
