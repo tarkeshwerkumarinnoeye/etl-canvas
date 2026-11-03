@@ -38,7 +38,8 @@ export function AnimatedEdge({
     targetPosition,
   });
   const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
+  const edgeColor = edgeStyle.color; // Always use the configured color for particles and marker
+  const strokeColor = selected ? '#ef4444' : edgeColor; // Only stroke turns red when selected
   const duration = edgeStyle.speed === 'fast' ? 1 : edgeStyle.speed === 'slow' ? 4 : 2;
 
   return (
@@ -46,23 +47,23 @@ export function AnimatedEdge({
       <BaseEdge id={id} path={edgePath} style={{
         ...style,
         strokeWidth: selected ? 4 : 3,
-        stroke: color,
-        filter: `drop-shadow(0 0 3px ${color}66)`,
+        stroke: strokeColor,
+        filter: `drop-shadow(0 0 3px ${strokeColor}66)`,
       }} markerEnd={markerEnd} />
       
-      <circle r="5" fill={color} opacity="0.95" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
+      <circle r="5" fill={edgeColor} opacity="0.95" style={{ filter: `drop-shadow(0 0 4px ${edgeColor})` }}>
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} />
       </circle>
-      <circle r="4" fill={color} opacity="0.7">
+      <circle r="4" fill={edgeColor} opacity="0.7">
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} begin={`${duration * 0.25}s`} />
       </circle>
-      <circle r="3.5" fill={color} opacity="0.5">
+      <circle r="3.5" fill={edgeColor} opacity="0.5">
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} begin={`${duration * 0.5}s`} />
       </circle>
-      <circle r="3" fill={color} opacity="0.7">
+      <circle r="3" fill={edgeColor} opacity="0.7">
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} begin={`${duration * 0.75}s`} />
       </circle>
-      <circle r="12" fill={color} opacity="0.15">
+      <circle r="12" fill={edgeColor} opacity="0.15">
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} />
       </circle>
     </g>
@@ -92,14 +93,14 @@ export function SolidEdge({
     targetPosition,
   });
   const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
+  const strokeColor = selected ? '#ef4444' : edgeStyle.color;
 
   return (
     <BaseEdge id={id} path={edgePath} style={{
       ...style,
       strokeWidth: selected ? 4 : 3,
-      stroke: color,
-      filter: `drop-shadow(0 0 2px ${color}66)`,
+      stroke: strokeColor,
+      filter: `drop-shadow(0 0 2px ${strokeColor}66)`,
     }} markerEnd={markerEnd} />
   );
 }
@@ -127,15 +128,15 @@ export function DashedEdge({
     targetPosition,
   });
   const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
+  const strokeColor = selected ? '#ef4444' : edgeStyle.color;
 
   return (
     <BaseEdge id={id} path={edgePath} style={{
       ...style,
       strokeWidth: selected ? 4 : 3,
-      stroke: color,
+      stroke: strokeColor,
       strokeDasharray: '10 6',
-      filter: `drop-shadow(0 0 2px ${color}66)`,
+      filter: `drop-shadow(0 0 2px ${strokeColor}66)`,
     }} markerEnd={markerEnd} />
   );
 }
@@ -163,16 +164,16 @@ export function DottedEdge({
     targetPosition,
   });
   const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
+  const strokeColor = selected ? '#ef4444' : edgeStyle.color;
 
   return (
     <BaseEdge id={id} path={edgePath} style={{
       ...style,
       strokeWidth: selected ? 4 : 3,
-      stroke: color,
+      stroke: strokeColor,
       strokeDasharray: '2 4',
       strokeLinecap: 'round',
-      filter: `drop-shadow(0 0 2px ${color}66)`,
+      filter: `drop-shadow(0 0 2px ${strokeColor}66)`,
     }} markerEnd={markerEnd} />
   );
 }
@@ -192,7 +193,7 @@ export function StepEdge({
   selected,
 }: EdgeProps) {
   const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
+  const strokeColor = selected ? '#ef4444' : edgeStyle.color;
   const offset = (data as any)?.offset || 25; // Default 25px offset from nodes
   
   const [edgePath] = getSmoothStepPath({
@@ -210,8 +211,8 @@ export function StepEdge({
     <BaseEdge id={id} path={edgePath} style={{
       ...style,
       strokeWidth: selected ? 4 : 3,
-      stroke: color,
-      filter: `drop-shadow(0 0 2px ${color}66)`,
+      stroke: strokeColor,
+      filter: `drop-shadow(0 0 2px ${strokeColor}66)`,
     }} markerEnd={markerEnd} />
   );
 }
@@ -237,14 +238,14 @@ export function StraightEdge({
     targetY,
   });
   const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
+  const strokeColor = selected ? '#ef4444' : edgeStyle.color;
 
   return (
     <BaseEdge id={id} path={edgePath} style={{
       ...style,
       strokeWidth: selected ? 4 : 3,
-      stroke: color,
-      filter: `drop-shadow(0 0 2px ${color}66)`,
+      stroke: strokeColor,
+      filter: `drop-shadow(0 0 2px ${strokeColor}66)`,
     }} markerEnd={markerEnd} />
   );
 }
@@ -264,7 +265,8 @@ export function AnimatedStepEdge({
   selected,
 }: EdgeProps) {
   const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
+  const edgeColor = edgeStyle.color; // Always use the configured color for particles and marker
+  const strokeColor = selected ? '#ef4444' : edgeColor; // Only stroke turns red when selected
   const duration = edgeStyle.speed === 'fast' ? 1 : edgeStyle.speed === 'slow' ? 4 : 2;
   const offset = (data as any)?.offset || 25;
   
@@ -284,17 +286,17 @@ export function AnimatedStepEdge({
       <BaseEdge id={id} path={edgePath} style={{
         ...style,
         strokeWidth: selected ? 4 : 3,
-        stroke: color,
-        filter: `drop-shadow(0 0 3px ${color}66)`,
+        stroke: strokeColor,
+        filter: `drop-shadow(0 0 3px ${strokeColor}66)`,
       }} markerEnd={markerEnd} />
       
-      <circle r="5" fill={color} opacity="0.95" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
+      <circle r="5" fill={edgeColor} opacity="0.95" style={{ filter: `drop-shadow(0 0 4px ${edgeColor})` }}>
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} />
       </circle>
-      <circle r="4" fill={color} opacity="0.7">
+      <circle r="4" fill={edgeColor} opacity="0.7">
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} begin={`${duration * 0.5}s`} />
       </circle>
-      <circle r="12" fill={color} opacity="0.15">
+      <circle r="12" fill={edgeColor} opacity="0.15">
         <animateMotion dur={`${duration}s`} repeatCount="indefinite" path={edgePath} />
       </circle>
     </g>

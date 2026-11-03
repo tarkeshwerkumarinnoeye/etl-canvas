@@ -372,7 +372,8 @@ export default function App() {
     return edges.map(e => {
       const isSelected = e.id === selectedEdgeId;
       const edgeData = (e.data as any) || {};
-      const edgeColor = isSelected ? '#ef4444' : (edgeData.color || '#6366f1');
+      const edgeColor = edgeData.color || '#6366f1'; // Always use the configured color for marker
+      const strokeColor = isSelected ? '#ef4444' : edgeColor; // Only stroke turns red when selected
       
       const baseEdge = {
         ...e,
@@ -383,7 +384,7 @@ export default function App() {
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: edgeColor,
+          color: edgeColor, // Marker always uses edge color, not selection color
         },
       };
 
@@ -394,11 +395,17 @@ export default function App() {
           data: e.data, // Preserve data
           style: {
             ...baseEdge.style,
-            stroke: edgeColor,
+            stroke: strokeColor,
           },
         } as Edge;
       }
-      return baseEdge as Edge;
+      return {
+        ...baseEdge,
+        style: {
+          ...baseEdge.style,
+          stroke: strokeColor,
+        },
+      } as Edge;
     });
   }, [edges, isAnimating, selectedEdgeId]);
 
