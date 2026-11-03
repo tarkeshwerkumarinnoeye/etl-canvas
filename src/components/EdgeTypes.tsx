@@ -177,7 +177,7 @@ export function DottedEdge({
   );
 }
 
-// Step edge (right angles)
+// Step edge (right angles) with offset to prevent overlap
 export function StepEdge({
   id,
   sourceX,
@@ -191,6 +191,10 @@ export function StepEdge({
   data,
   selected,
 }: EdgeProps) {
+  const edgeStyle = getEdgeStyle(data);
+  const color = selected ? '#ef4444' : edgeStyle.color;
+  const offset = (data as any)?.offset || 25; // Default 25px offset from nodes
+  
   const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -199,9 +203,8 @@ export function StepEdge({
     targetY,
     targetPosition,
     borderRadius: 8,
+    offset,
   });
-  const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
 
   return (
     <BaseEdge id={id} path={edgePath} style={{
@@ -246,7 +249,7 @@ export function StraightEdge({
   );
 }
 
-// Animated step edge
+// Animated step edge with offset
 export function AnimatedStepEdge({
   id,
   sourceX,
@@ -260,6 +263,11 @@ export function AnimatedStepEdge({
   data,
   selected,
 }: EdgeProps) {
+  const edgeStyle = getEdgeStyle(data);
+  const color = selected ? '#ef4444' : edgeStyle.color;
+  const duration = edgeStyle.speed === 'fast' ? 1 : edgeStyle.speed === 'slow' ? 4 : 2;
+  const offset = (data as any)?.offset || 25;
+  
   const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -268,10 +276,8 @@ export function AnimatedStepEdge({
     targetY,
     targetPosition,
     borderRadius: 8,
+    offset,
   });
-  const edgeStyle = getEdgeStyle(data);
-  const color = selected ? '#ef4444' : edgeStyle.color;
-  const duration = edgeStyle.speed === 'fast' ? 1 : edgeStyle.speed === 'slow' ? 4 : 2;
 
   return (
     <g>

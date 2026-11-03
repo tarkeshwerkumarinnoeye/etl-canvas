@@ -4,9 +4,11 @@ interface EdgeStylePanelProps {
   edgeStyle: string;
   edgeColor: string;
   edgeSpeed: 'slow' | 'normal' | 'fast';
+  edgeOffset: number;
   onStyleChange: (style: string) => void;
   onColorChange: (color: string) => void;
   onSpeedChange: (speed: 'slow' | 'normal' | 'fast') => void;
+  onOffsetChange: (offset: number) => void;
   onClose: () => void;
 }
 
@@ -43,9 +45,11 @@ export function EdgeStylePanel({
   edgeStyle,
   edgeColor,
   edgeSpeed,
+  edgeOffset,
   onStyleChange,
   onColorChange,
   onSpeedChange,
+  onOffsetChange,
   onClose,
 }: EdgeStylePanelProps) {
   return (
@@ -128,6 +132,28 @@ export function EdgeStylePanel({
                   <span>{speed.label}</span>
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Offset (for step edges) */}
+        {(edgeStyle === 'step' || edgeStyle === 'animated-step') && (
+          <div>
+            <label className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 block">
+              Distance from Nodes: {edgeOffset}px
+            </label>
+            <input
+              type="range"
+              min="10"
+              max="100"
+              step="5"
+              value={edgeOffset}
+              onChange={(e) => onOffsetChange(Number(e.target.value))}
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+            />
+            <div className="flex justify-between text-[10px] text-gray-500 mt-1">
+              <span>Close</span>
+              <span>Far</span>
             </div>
           </div>
         )}

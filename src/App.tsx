@@ -324,6 +324,18 @@ export default function App() {
     }));
   }, [setEdges, selectedEdgeId]);
 
+  const handleEdgeOffsetChange = useCallback((offset: number) => {
+    setEdges((eds) => eds.map((e) => {
+      if (e.id === selectedEdgeId) {
+        return {
+          ...e,
+          data: { ...e.data, offset },
+        } as Edge;
+      }
+      return e;
+    }));
+  }, [setEdges, selectedEdgeId]);
+
   const handleEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
     setSelectedEdgeId(edge.id);
   }, []);
@@ -359,15 +371,19 @@ export default function App() {
   const displayEdges = useMemo(() => {
     return edges.map(e => {
       const isSelected = e.id === selectedEdgeId;
+      const edgeData = (e.data as any) || {};
+      const edgeColor = isSelected ? '#ef4444' : (edgeData.color || '#6366f1');
+      
       const baseEdge = {
         ...e,
+        data: e.data, // Explicitly preserve data
         style: {
           ...e.style,
           strokeWidth: isSelected ? 4 : 3,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: isSelected ? '#ef4444' : (e.markerEnd as any)?.color || '#6366f1',
+          color: edgeColor,
         },
       };
 
@@ -375,9 +391,10 @@ export default function App() {
         return {
           ...baseEdge,
           type: e.type === 'animated-step' ? 'step' : 'solid',
+          data: e.data, // Preserve data
           style: {
             ...baseEdge.style,
-            stroke: isSelected ? '#ef4444' : ((e.data as any)?.color || '#4b5563'),
+            stroke: edgeColor,
           },
         } as Edge;
       }
@@ -393,6 +410,7 @@ export default function App() {
       style: edge.type || 'animated',
       color: (edge.data as any)?.color || '#6366f1',
       speed: (edge.data as any)?.speed || 'normal',
+      offset: (edge.data as any)?.offset || 25,
     };
   }, [edges, selectedEdgeId]);
 
@@ -493,9 +511,11 @@ export default function App() {
               edgeStyle={selectedEdgeData.style}
               edgeColor={selectedEdgeData.color}
               edgeSpeed={selectedEdgeData.speed}
+              edgeOffset={selectedEdgeData.offset}
               onStyleChange={handleEdgeStyleChange}
               onColorChange={handleEdgeColorChange}
               onSpeedChange={handleEdgeSpeedChange}
+              onOffsetChange={handleEdgeOffsetChange}
               onClose={() => setSelectedEdgeId(null)}
             />
           )}
