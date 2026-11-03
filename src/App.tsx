@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
   ReactFlow,
+  ReactFlowProvider,
   Background,
   Controls,
   MiniMap,
@@ -20,6 +21,7 @@ import { PipelineNodeComponent } from './components/PipelineNode';
 import { AnimatedEdge, AnimatedEdgeFast, AnimatedEdgeSlow } from './components/AnimatedEdge';
 import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
+import { Info, X } from 'lucide-react';
 import type { SidebarItem } from './types';
 
 const nodeTypes = {
@@ -140,6 +142,7 @@ export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [isAnimating, setIsAnimating] = useState(true);
+  const [showInfoPanel, setShowInfoPanel] = useState(false);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
@@ -347,6 +350,7 @@ export default function App() {
         <Sidebar onDragStart={onDragStart} />
         
         <div className="flex-1 relative" ref={reactFlowWrapper}>
+          <ReactFlowProvider>
           <ReactFlow
             nodes={nodes}
             edges={displayEdges}
@@ -410,52 +414,64 @@ export default function App() {
               </defs>
             </svg>
           </ReactFlow>
+          </ReactFlowProvider>
 
-          {/* Floating info panel */}
-          <div className="absolute bottom-4 left-4 bg-gray-900/90 backdrop-blur-sm border border-gray-700/50 rounded-xl px-4 py-3 text-xs text-gray-400">
-            <div className="font-semibold text-gray-300 mb-2 text-[11px] uppercase tracking-wider">Node Types</div>
-            <div className="space-y-1.5 mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span>Source</span>
+          {/* Info toggle button - always visible */}
+          <button
+            onClick={() => setShowInfoPanel(!showInfoPanel)}
+            className="absolute bottom-4 left-4 w-10 h-10 bg-gray-900/90 backdrop-blur-sm border border-gray-700/50 rounded-xl flex items-center justify-center text-gray-400 hover:text-indigo-400 hover:border-indigo-500/50 transition-all duration-200 shadow-lg hover:shadow-indigo-500/20 z-50"
+            title={showInfoPanel ? "Hide help" : "Show help"}
+          >
+            {showInfoPanel ? <X size={18} /> : <Info size={18} />}
+          </button>
+
+          {/* Floating info panel - only shows when toggled */}
+          {showInfoPanel && (
+            <div className="absolute bottom-16 left-4 bg-gray-900/95 backdrop-blur-sm border border-gray-700/50 rounded-xl px-4 py-3 text-xs text-gray-400 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+              <div className="font-semibold text-gray-300 mb-2 text-[11px] uppercase tracking-wider">Node Types</div>
+              <div className="space-y-1.5 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  <span>Source</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-purple-500" />
+                  <span>Processing</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-amber-500" />
+                  <span>Infrastructure</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <span>Sink</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500" />
-                <span>Processing</span>
+              <div className="font-semibold text-gray-300 mb-2 text-[11px] uppercase tracking-wider border-t border-gray-700/50 pt-2">Flow Speeds</div>
+              <div className="space-y-1.5 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-0.5 bg-indigo-500 rounded" />
+                  <span>Normal</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-0.5 bg-emerald-500 rounded" />
+                  <span>Fast</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-0.5 bg-amber-500 rounded" />
+                  <span>Slow / Batch</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <span>Infrastructure</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                <span>Sink</span>
+              <div className="font-semibold text-gray-300 mb-1.5 text-[11px] uppercase tracking-wider border-t border-gray-700/50 pt-2">Shortcuts</div>
+              <div className="space-y-1 text-[10px]">
+                <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Del</kbd> Remove selected node/edge</div>
+                <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">R</kbd> Reverse edge direction</div>
+                <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Click</kbd> Select edge to delete</div>
+                <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Scroll</kbd> Zoom</div>
+                <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Drag</kbd> Connect from any side</div>
               </div>
             </div>
-            <div className="font-semibold text-gray-300 mb-2 text-[11px] uppercase tracking-wider border-t border-gray-700/50 pt-2">Flow Speeds</div>
-            <div className="space-y-1.5 mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-0.5 bg-indigo-500 rounded" />
-                <span>Normal</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-0.5 bg-emerald-500 rounded" />
-                <span>Fast</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-0.5 bg-amber-500 rounded" />
-                <span>Slow / Batch</span>
-              </div>
-            </div>
-            <div className="font-semibold text-gray-300 mb-1.5 text-[11px] uppercase tracking-wider border-t border-gray-700/50 pt-2">Shortcuts</div>
-            <div className="space-y-1 text-[10px]">
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Del</kbd> Remove selected node/edge</div>
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">R</kbd> Reverse edge direction</div>
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Click</kbd> Select edge to delete</div>
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Scroll</kbd> Zoom</div>
-              <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Drag</kbd> Connect from any side</div>
-            </div>
-          </div>
+          )}
 
           {/* Instructions overlay when empty */}
           {nodes.length === 0 && (
