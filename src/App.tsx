@@ -18,9 +18,18 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { PipelineNodeComponent } from './components/PipelineNode';
-import { AnimatedEdge, AnimatedEdgeFast, AnimatedEdgeSlow } from './components/AnimatedEdge';
+import {
+  AnimatedEdge,
+  SolidEdge,
+  DashedEdge,
+  DottedEdge,
+  StepEdge,
+  StraightEdge,
+  AnimatedStepEdge,
+} from './components/EdgeTypes';
 import { Sidebar } from './components/Sidebar';
 import { Toolbar } from './components/Toolbar';
+import { EdgeStylePanel } from './components/EdgeStylePanel';
 import { Info, X } from 'lucide-react';
 import type { SidebarItem } from './types';
 
@@ -30,8 +39,12 @@ const nodeTypes = {
 
 const edgeTypes = {
   animated: AnimatedEdge,
-  animatedFast: AnimatedEdgeFast,
-  animatedSlow: AnimatedEdgeSlow,
+  'animated-step': AnimatedStepEdge,
+  solid: SolidEdge,
+  dashed: DashedEdge,
+  dotted: DottedEdge,
+  step: StepEdge,
+  straight: StraightEdge,
 };
 
 let id = 0;
@@ -121,18 +134,18 @@ function createExamplePipeline() {
   ];
 
   const edges = [
-    { id: 'e1-4', source: '1', target: '4', type: 'animated' },
-    { id: 'e2-5', source: '2', target: '5', type: 'animatedFast' },
-    { id: 'e3-5', source: '3', target: '5', type: 'animatedSlow' },
-    { id: 'e4-6', source: '4', target: '6', type: 'animated' },
-    { id: 'e5-7', source: '5', target: '7', type: 'animated' },
-    { id: 'e5-8', source: '5', target: '8', type: 'animatedFast' },
-    { id: 'e6-9', source: '6', target: '9', type: 'animated' },
-    { id: 'e7-10', source: '7', target: '10', type: 'animatedSlow' },
-    { id: 'e8-10', source: '8', target: '10', type: 'animated' },
-    { id: 'e9-11', source: '9', target: '11', type: 'animatedFast' },
-    { id: 'e10-12', source: '10', target: '12', type: 'animated' },
-    { id: 'e10-13', source: '10', target: '13', type: 'animated' },
+    { id: 'e1-4', source: '1', target: '4', type: 'animated', data: { color: '#3b82f6', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#3b82f6' } },
+    { id: 'e2-5', source: '2', target: '5', type: 'animated', data: { color: '#22c55e', speed: 'fast' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#22c55e' } },
+    { id: 'e3-5', source: '3', target: '5', type: 'animated', data: { color: '#f97316', speed: 'slow' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#f97316' } },
+    { id: 'e4-6', source: '4', target: '6', type: 'animated-step', data: { color: '#8b5cf6', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#8b5cf6' } },
+    { id: 'e5-7', source: '5', target: '7', type: 'solid', data: { color: '#ec4899', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#ec4899' } },
+    { id: 'e5-8', source: '5', target: '8', type: 'dashed', data: { color: '#06b6d4', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#06b6d4' } },
+    { id: 'e6-9', source: '6', target: '9', type: 'animated', data: { color: '#eab308', speed: 'fast' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#eab308' } },
+    { id: 'e7-10', source: '7', target: '10', type: 'step', data: { color: '#ef4444', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#ef4444' } },
+    { id: 'e8-10', source: '8', target: '10', type: 'dotted', data: { color: '#6366f1', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1' } },
+    { id: 'e9-11', source: '9', target: '11', type: 'animated', data: { color: '#22c55e', speed: 'fast' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#22c55e' } },
+    { id: 'e10-12', source: '10', target: '12', type: 'straight', data: { color: '#f97316', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#f97316' } },
+    { id: 'e10-13', source: '10', target: '13', type: 'animated', data: { color: '#8b5cf6', speed: 'normal' }, markerEnd: { type: MarkerType.ArrowClosed, color: '#8b5cf6' } },
   ];
 
   return { nodes, edges };
@@ -143,6 +156,7 @@ export default function App() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [isAnimating, setIsAnimating] = useState(true);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
@@ -152,7 +166,8 @@ export default function App() {
         ...params,
         type: 'animated',
         markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1' },
-      } as Edge, eds));
+        data: { color: '#6366f1', speed: 'normal' },
+      } as unknown as Edge, eds));
     },
     [setEdges],
   );
@@ -275,6 +290,60 @@ export default function App() {
     }));
   }, [setEdges]);
 
+  const handleEdgeStyleChange = useCallback((style: string) => {
+    setEdges((eds) => eds.map((e) => {
+      if (e.id === selectedEdgeId) {
+        return { ...e, type: style } as Edge;
+      }
+      return e;
+    }));
+  }, [setEdges, selectedEdgeId]);
+
+  const handleEdgeColorChange = useCallback((color: string) => {
+    setEdges((eds) => eds.map((e) => {
+      if (e.id === selectedEdgeId) {
+        return {
+          ...e,
+          data: { ...e.data, color },
+          markerEnd: { type: MarkerType.ArrowClosed, color },
+        } as Edge;
+      }
+      return e;
+    }));
+  }, [setEdges, selectedEdgeId]);
+
+  const handleEdgeSpeedChange = useCallback((speed: 'slow' | 'normal' | 'fast') => {
+    setEdges((eds) => eds.map((e) => {
+      if (e.id === selectedEdgeId) {
+        return {
+          ...e,
+          data: { ...e.data, speed },
+        } as Edge;
+      }
+      return e;
+    }));
+  }, [setEdges, selectedEdgeId]);
+
+  const handleEdgeOffsetChange = useCallback((offset: number) => {
+    setEdges((eds) => eds.map((e) => {
+      if (e.id === selectedEdgeId) {
+        return {
+          ...e,
+          data: { ...e.data, offset },
+        } as Edge;
+      }
+      return e;
+    }));
+  }, [setEdges, selectedEdgeId]);
+
+  const handleEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    setSelectedEdgeId(edge.id);
+  }, []);
+
+  const handlePaneClick = useCallback(() => {
+    setSelectedEdgeId(null);
+  }, []);
+
   // Keyboard shortcut: R to reverse selected edge
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -301,32 +370,56 @@ export default function App() {
   // Control animation visibility and highlight selected edges
   const displayEdges = useMemo(() => {
     return edges.map(e => {
-      const isSelected = e.selected;
+      const isSelected = e.id === selectedEdgeId;
+      const edgeData = (e.data as any) || {};
+      const edgeColor = edgeData.color || '#6366f1'; // Always use the configured color for marker
+      const strokeColor = isSelected ? '#ef4444' : edgeColor; // Only stroke turns red when selected
+      
       const baseEdge = {
         ...e,
+        data: e.data, // Explicitly preserve data
         style: {
           ...e.style,
           strokeWidth: isSelected ? 4 : 3,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: isSelected ? '#ef4444' : (e.markerEnd as any)?.color || '#6366f1',
+          color: edgeColor, // Marker always uses edge color, not selection color
         },
       };
 
-      if (!isAnimating) {
+      if (!isAnimating && (e.type === 'animated' || e.type === 'animated-step')) {
         return {
           ...baseEdge,
-          type: 'default',
+          type: e.type === 'animated-step' ? 'step' : 'solid',
+          data: e.data, // Preserve data
           style: {
             ...baseEdge.style,
-            stroke: isSelected ? '#ef4444' : '#4b5563',
+            stroke: strokeColor,
           },
         } as Edge;
       }
-      return baseEdge as Edge;
+      return {
+        ...baseEdge,
+        style: {
+          ...baseEdge.style,
+          stroke: strokeColor,
+        },
+      } as Edge;
     });
-  }, [edges, isAnimating]);
+  }, [edges, isAnimating, selectedEdgeId]);
+
+  // Get selected edge data for the panel
+  const selectedEdgeData = useMemo(() => {
+    const edge = edges.find(e => e.id === selectedEdgeId);
+    if (!edge) return null;
+    return {
+      style: edge.type || 'animated',
+      color: (edge.data as any)?.color || '#6366f1',
+      speed: (edge.data as any)?.speed || 'normal',
+      offset: (edge.data as any)?.offset || 25,
+    };
+  }, [edges, selectedEdgeId]);
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-950 overflow-hidden">
@@ -360,6 +453,8 @@ export default function App() {
             onInit={(instance: ReactFlowInstance) => setReactFlowInstance(instance)}
             onDrop={onDrop}
             onDragOver={onDragOver}
+            onEdgeClick={handleEdgeClick}
+            onPaneClick={handlePaneClick}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             fitView
@@ -367,6 +462,7 @@ export default function App() {
             defaultEdgeOptions={{
               type: 'animated',
               markerEnd: { type: MarkerType.ArrowClosed, color: '#6366f1' },
+              data: { color: '#6366f1', speed: 'normal' },
             }}
             className="bg-gray-950"
             selectNodesOnDrag={false}
@@ -415,6 +511,21 @@ export default function App() {
             </svg>
           </ReactFlow>
           </ReactFlowProvider>
+
+          {/* Edge Style Panel - shows when an edge is selected */}
+          {selectedEdgeId && selectedEdgeData && (
+            <EdgeStylePanel
+              edgeStyle={selectedEdgeData.style}
+              edgeColor={selectedEdgeData.color}
+              edgeSpeed={selectedEdgeData.speed}
+              edgeOffset={selectedEdgeData.offset}
+              onStyleChange={handleEdgeStyleChange}
+              onColorChange={handleEdgeColorChange}
+              onSpeedChange={handleEdgeSpeedChange}
+              onOffsetChange={handleEdgeOffsetChange}
+              onClose={() => setSelectedEdgeId(null)}
+            />
+          )}
 
           {/* Info toggle button - always visible */}
           <button
@@ -466,7 +577,7 @@ export default function App() {
               <div className="space-y-1 text-[10px]">
                 <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Del</kbd> Remove selected node/edge</div>
                 <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">R</kbd> Reverse edge direction</div>
-                <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Click</kbd> Select edge to delete</div>
+                <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Click</kbd> Select edge to customize</div>
                 <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Scroll</kbd> Zoom</div>
                 <div><kbd className="px-1 py-0.5 bg-gray-800 rounded text-gray-300 font-mono">Drag</kbd> Connect from any side</div>
               </div>
