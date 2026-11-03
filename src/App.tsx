@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
   ReactFlow,
+  ReactFlowProvider,
   Background,
   Controls,
   MiniMap,
@@ -349,6 +350,7 @@ export default function App() {
         <Sidebar onDragStart={onDragStart} />
         
         <div className="flex-1 relative" ref={reactFlowWrapper}>
+          <ReactFlowProvider>
           <ReactFlow
             nodes={nodes}
             edges={displayEdges}
@@ -412,6 +414,7 @@ export default function App() {
               </defs>
             </svg>
           </ReactFlow>
+          </ReactFlowProvider>
 
           {/* Info toggle button - always visible */}
           <button
