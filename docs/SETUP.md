@@ -49,6 +49,8 @@ VITE_SUPABASE_ANON_KEY=your-anon-public-key-here
 5. Wait for execution to complete
 6. Repeat for `docs/rls-policies.sql`
 
+> ⚠️ **Important**: The RLS policies use SECURITY DEFINER helper functions to prevent circular reference errors. If you encounter an "infinite recursion" error, see `docs/FIX_RECURSION_ERROR.md` for the fix.
+
 ### Option B: Using Table Editor (Visual)
 
 1. Go to **Table Editor** in Supabase dashboard

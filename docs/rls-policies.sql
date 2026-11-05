@@ -1,6 +1,10 @@
 -- ============================================================================
 -- Pipeline Designer - Row Level Security (RLS) Policies
 -- Run this AFTER schema.sql in Supabase SQL Editor
+-- 
+-- ⚠️ IMPORTANT: This file uses SECURITY DEFINER helper functions to prevent
+-- "infinite recursion" errors. If you already ran the old version, see
+-- docs/FIX_RECURSION_ERROR.md for migration instructions.
 -- ============================================================================
 
 -- ============================================================================
